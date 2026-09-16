@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Speedometer arc and needle, kept inside the 72dp adaptive-icon safe zone. -->
+    <path
+        android:pathData="M30,66a24,24 0 1,1 48,0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent" />
+    <path
+        android:pathData="M54,66L68,50"
+        android:strokeColor="#FF41C7F0"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M54,62.5a3.5,3.5 0 1,0 0.1,0z"
+        android:fillColor="#FF41C7F0" />
+</vector>

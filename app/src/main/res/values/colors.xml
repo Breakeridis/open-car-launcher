@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Day cockpit. values-night/colors.xml defines the SAME names for the dark cockpit, so
+  layouts can reference @color/cockpit_* directly and the theme switch costs nothing.
+-->
+<resources>
+    <color name="cockpit_bg">#FFF2F4F7</color>
+    <color name="cockpit_surface">#FFFFFFFF</color>
+    <color name="cockpit_surface_alt">#FFE6EAF0</color>
+    <color name="cockpit_divider">#33202632</color>
+
+    <color name="cockpit_text_primary">#FF101418</color>
+    <color name="cockpit_text_secondary">#FF3C444F</color>
+    <color name="cockpit_text_dim">#FF6B7583</color>
+
+    <color name="cockpit_accent">#FF0B63CE</color>
+    <color name="cockpit_accent_dim">#FF6D9BD8</color>
+    <color name="cockpit_speed">#FF0B63CE</color>
+    <color name="cockpit_badge">#FFD32F2F</color>
+
+    <color name="cockpit_scrim">#F2F2F4F7</color>
+    <color name="cockpit_ripple">#33101418</color>
+</resources>

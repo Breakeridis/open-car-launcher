@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Persistent bottom bar. The three system actions (all apps, settings, about) are hard-coded
+  and cannot be removed; only the middle slots are user-assignable.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dock_height"
+    android:background="@drawable/bg_dock"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
+
+    <ImageButton
+        android:id="@+id/btnAllApps"
+        android:layout_width="@dimen/dock_item_width"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_dock_item"
+        android:contentDescription="@string/dock_all_apps"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_apps" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@color/cockpit_divider" />
+
+    <!-- User-assignable slots, inflated from item_dock.xml by DockController. -->
+    <LinearLayout
+        android:id="@+id/dockSlots"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical|start"
+        android:orientation="horizontal" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@color/cockpit_divider" />
+
+    <ImageButton
+        android:id="@+id/btnSettings"
+        android:layout_width="@dimen/dock_item_width"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_dock_item"
+        android:contentDescription="@string/dock_settings"
+        android:padding="14dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_settings" />
+
+    <FrameLayout
+        android:layout_width="@dimen/dock_item_width"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/btnAbout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_dock_item"
+            android:contentDescription="@string/dock_about"
+            android:padding="14dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_info" />
+
+        <View
+            android:id="@+id/updateBadge"
+            android:layout_width="@dimen/badge_size"
+            android:layout_height="@dimen/badge_size"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/badge_dot"
+            android:contentDescription="@string/update_available_badge"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</LinearLayout>

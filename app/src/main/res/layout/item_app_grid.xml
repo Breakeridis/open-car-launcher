@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Flat on purpose: one ImageView, one TextView, fixed height, no nested weights. This view is
+  inflated and bound hundreds of times while flinging the drawer, so every extra measure pass
+  here costs frames.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/appItemRoot"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/app_grid_item_height"
+    android:background="@drawable/bg_dock_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:longClickable="true"
+    android:orientation="vertical"
+    android:paddingTop="8dp">
+
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_width="@dimen/app_icon_size"
+        android:layout_height="@dimen/app_icon_size"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/appLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:textColor="@color/cockpit_text_secondary"
+        android:textSize="@dimen/app_label_text" />
+
+</LinearLayout>

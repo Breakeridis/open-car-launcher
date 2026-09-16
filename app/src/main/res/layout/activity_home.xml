@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single-activity launcher. The app drawer is an overlay in this same layout rather than a
+  fragment or second activity: opening it is then a visibility flip with no transaction, no
+  window animation and no risk of the home task stacking.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cockpit_bg">
+
+    <!-- ============================ DASHBOARD ============================ -->
+    <LinearLayout
+        android:id="@+id/dashboard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding"
+        app:layout_constraintBottom_toTopOf="@id/dockStrip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Gauge row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <!-- Speedometer. Tapping anywhere on it toggles KM/H <-> MPH. -->
+            <LinearLayout
+                android:id="@+id/gaugeSpeed"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_gauge"
+                android:clickable="true"
+                android:contentDescription="@string/speed"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/textSpeed"
+                    style="@style/Text.Gauge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/speed_placeholder"
+                    android:textColor="@color/cockpit_speed"
+                    android:textSize="@dimen/speed_text" />
+
+                <TextView
+                    android:id="@+id/textSpeedUnit"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unit_kmh"
+                    android:textColor="@color/cockpit_text_secondary"
+                    android:textSize="@dimen/speed_unit_text" />
+
+                <TextView
+                    android:id="@+id/textSpeedStatus"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/gps_acquiring" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/gap"
+                android:layout_height="match_parent" />
+
+            <!-- Clock. TextClock ticks itself from the system time broadcasts, so there is no
+                 Handler loop burning CPU on a head unit that is powered all day. -->
+            <LinearLayout
+                android:id="@+id/gaugeClock"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.4"
+                android:background="@drawable/bg_gauge"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextClock
+                    android:id="@+id/clockTime"
+                    style="@style/Text.Gauge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:textSize="@dimen/clock_text"
+                    tools:text="12:47" />
+
+                <TextClock
+                    android:id="@+id/clockDay"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:format12Hour="EEEE"
+                    android:format24Hour="EEEE"
+                    android:textColor="@color/cockpit_accent"
+                    android:textSize="@dimen/date_text"
+                    tools:text="TUESDAY" />
+
+                <TextClock
+                    android:id="@+id/clockDate"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format12Hour="d MMMM yyyy"
+                    android:format24Hour="d MMMM yyyy"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/date_text"
+                    tools:text="16 September 2026" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/gap"
+                android:layout_height="match_parent" />
+
+            <!-- Compass -->
+            <LinearLayout
+                android:id="@+id/gaugeCompass"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_gauge"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/textCardinal"
+                    style="@style/Text.Gauge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/speed_placeholder"
+                    android:textSize="@dimen/cardinal_text"
+                    tools:text="NE" />
+
+                <TextView
+                    android:id="@+id/textDegrees"
+                    style="@style/Text.Gauge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/cockpit_text_secondary"
+                    android:textSize="@dimen/degrees_text"
+                    tools:text="43°" />
+
+                <TextView
+                    android:id="@+id/textHeadingSource"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/heading" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/gap" />
+
+        <!-- ========================= QUICK CARDS ========================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/card_height"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/cardProjection"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/iconProjection"
+                    android:layout_width="@dimen/card_icon"
+                    android:layout_height="@dimen/card_icon"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_phone_link" />
+
+                <TextView
+                    android:id="@+id/titleProjection"
+                    style="@style/Text.Gauge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:text="@string/card_projection"
+                    android:textSize="@dimen/card_label_text" />
+
+                <TextView
+                    android:id="@+id/subtitleProjection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/projection_hint"
+                    android:textColor="@color/cockpit_text_dim"
+                    android:textSize="@dimen/card_sub_text" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/gap"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:id="@+id/cardNav"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/iconNav"
+                    android:layout_width="@dimen/card_icon"
+                    android:layout_height="@dimen/card_icon"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_navigation" />
+
+                <TextView
+                    android:id="@+id/titleNav"
+                    style="@style/Text.Gauge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:text="@string/card_navigation"
+                    android:textSize="@dimen/card_label_text" />
+
+                <TextView
+                    android:id="@+id/subtitleNav"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/card_not_set"
+                    android:textColor="@color/cockpit_text_dim"
+                    android:textSize="@dimen/card_sub_text" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/gap"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:id="@+id/cardMusic"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/iconMusic"
+                    android:layout_width="@dimen/card_icon"
+                    android:layout_height="@dimen/card_icon"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_music" />
+
+                <TextView
+                    android:id="@+id/titleMusic"
+                    style="@style/Text.Gauge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:text="@string/card_music"
+                    android:textSize="@dimen/card_label_text" />
+
+                <TextView
+                    android:id="@+id/subtitleMusic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/card_not_set"
+                    android:textColor="@color/cockpit_text_dim"
+                    android:textSize="@dimen/card_sub_text" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ============================== DRAWER ============================== -->
+    <LinearLayout
+        android:id="@+id/drawerContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/cockpit_scrim"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/dockStrip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_search" />
+
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="@string/search_apps"
+                    android:imeOptions="actionSearch|flagNoExtractUi"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minHeight="56dp"
+                    android:singleLine="true"
+                    android:textColor="@color/cockpit_text_primary"
+                    android:textColorHint="@color/cockpit_text_dim"
+                    android:textSize="@dimen/search_text"
+                    android:autofillHints="" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnCloseDrawer"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_dock_item"
+                android:contentDescription="@string/close_drawer"
+                android:src="@drawable/ic_close" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/appGrid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp"
+                android:scrollbars="vertical" />
+
+            <TextView
+                android:id="@+id/drawerEmpty"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/loading_apps"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- =============================== DOCK =============================== -->
+    <include
+        android:id="@+id/dockStrip"
+        layout="@layout/view_dock"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dock_height"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

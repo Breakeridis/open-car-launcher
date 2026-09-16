@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Larger panels (1280x720 and up) can afford bigger gauges. -->
+<resources>
+    <dimen name="screen_padding">24dp</dimen>
+    <dimen name="gap">16dp</dimen>
+
+    <dimen name="speed_text">140sp</dimen>
+    <dimen name="speed_unit_text">26sp</dimen>
+    <dimen name="clock_text">96sp</dimen>
+    <dimen name="date_text">24sp</dimen>
+    <dimen name="cardinal_text">72sp</dimen>
+    <dimen name="degrees_text">22sp</dimen>
+
+    <dimen name="card_label_text">26sp</dimen>
+    <dimen name="card_icon">52dp</dimen>
+    <dimen name="card_height">160dp</dimen>
+
+    <dimen name="dock_height">88dp</dimen>
+    <dimen name="dock_icon">52dp</dimen>
+    <dimen name="dock_item_width">84dp</dimen>
+
+    <dimen name="app_icon_size">64dp</dimen>
+    <dimen name="app_grid_item_height">120dp</dimen>
+</resources>

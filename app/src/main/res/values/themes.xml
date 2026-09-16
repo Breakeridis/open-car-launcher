@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.CarLauncher" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/cockpit_accent</item>
+        <item name="colorOnPrimary">@color/cockpit_bg</item>
+        <item name="colorSecondary">@color/cockpit_accent</item>
+        <item name="colorSurface">@color/cockpit_surface</item>
+        <item name="colorOnSurface">@color/cockpit_text_primary</item>
+        <item name="colorSurfaceVariant">@color/cockpit_surface_alt</item>
+        <item name="colorOnSurfaceVariant">@color/cockpit_text_secondary</item>
+        <item name="colorError">@color/cockpit_badge</item>
+        <item name="android:colorBackground">@color/cockpit_bg</item>
+        <item name="android:textColorPrimary">@color/cockpit_text_primary</item>
+        <item name="android:textColorSecondary">@color/cockpit_text_secondary</item>
+        <item name="android:windowBackground">@color/cockpit_bg</item>
+    </style>
+
+    <!-- The HOME activity itself. Opaque background: most head units have no wallpaper. -->
+    <style name="Theme.CarLauncher.Home">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/cockpit_bg</item>
+        <item name="android:windowContentTransitions">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="Theme.CarLauncher.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/cockpit_surface</item>
+        <item name="colorOnSurface">@color/cockpit_text_primary</item>
+        <item name="colorPrimary">@color/cockpit_accent</item>
+    </style>
+
+    <!-- Tabular figures so the clock and speedometer do not shift width as digits change. -->
+    <style name="Text.Gauge">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/cockpit_text_primary</item>
+    </style>
+
+    <style name="Text.Caption">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textSize">@dimen/gauge_caption_text</item>
+        <item name="android:textColor">@color/cockpit_text_dim</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+</resources>
