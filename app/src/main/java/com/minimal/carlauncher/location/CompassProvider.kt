@@ -33,7 +33,8 @@ class CompassProvider(context: Context) {
     /** Cold flow of filtered azimuth in degrees [0, 360). */
     fun headings(): Flow<Float> = callbackFlow {
         val sensor = rotationSensor
-        if (sensor == null || sensorManager == null) {
+        val manager = sensorManager
+        if (sensor == null || manager == null) {
             close()
             return@callbackFlow
         }
@@ -76,9 +77,9 @@ class CompassProvider(context: Context) {
         }
 
         // SENSOR_DELAY_UI (~60ms), never FASTEST - this runs on the launcher's main looper.
-        sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
+        manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
 
-        awaitClose { runCatching { sensorManager.unregisterListener(listener) } }
+        awaitClose { runCatching { manager.unregisterListener(listener) } }
     }
 
     private companion object {

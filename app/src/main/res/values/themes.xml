@@ -31,7 +31,7 @@
     </style>
 
     <!-- Tabular figures so the clock and speedometer do not shift width as digits change. -->
-    <style name="Text.Gauge">
+    <style name="Text.Gauge" parent="">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:fontFeatureSettings">tnum</item>
         <item name="android:includeFontPadding">false</item>
@@ -39,7 +39,7 @@
         <item name="android:textColor">@color/cockpit_text_primary</item>
     </style>
 
-    <style name="Text.Caption">
+    <style name="Text.Caption" parent="">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:letterSpacing">0.12</item>

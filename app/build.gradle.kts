@@ -27,8 +27,8 @@ android {
         versionName = "1.0.0"
 
         // TODO: point these at the repository that hosts the release APKs.
-        buildConfigField("String", "GITHUB_OWNER", "\"TODO_OWNER\"")
-        buildConfigField("String", "GITHUB_REPO", "\"TODO_REPO\"")
+        buildConfigField("String", "GITHUB_OWNER", "\"Breakeridis\"")
+        buildConfigField("String", "GITHUB_REPO", "\"open-car-launcher\"")
 
     }
 

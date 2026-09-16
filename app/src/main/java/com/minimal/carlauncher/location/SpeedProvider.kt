@@ -52,7 +52,9 @@ class SpeedProvider(context: Context) {
      */
     @SuppressLint("MissingPermission")
     fun locations(): Flow<Location> = callbackFlow {
-        if (!hasPermission || locationManager == null) {
+        // Bound to a local: smart-casting a property inside the awaitClose closure is fragile.
+        val manager = locationManager
+        if (!hasPermission || manager == null) {
             close()
             return@callbackFlow
         }
@@ -76,7 +78,7 @@ class SpeedProvider(context: Context) {
         lastFreshLocation()?.let { trySend(it) }
 
         try {
-            locationManager.requestLocationUpdates(
+            manager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 1_000L,   // 1 Hz, matching a typical GNSS fix rate
                 0f,       // MUST be 0: a distance filter freezes the readout when stationary
@@ -88,14 +90,15 @@ class SpeedProvider(context: Context) {
             return@callbackFlow
         }
 
-        awaitClose { runCatching { locationManager.removeUpdates(listener) } }
+        awaitClose { runCatching { manager.removeUpdates(listener) } }
     }
 
     @SuppressLint("MissingPermission")
     fun lastFreshLocation(): Location? {
-        if (!hasPermission || locationManager == null) return null
+        val manager = locationManager
+        if (!hasPermission || manager == null) return null
         val last = try {
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            manager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         } catch (e: Exception) {
             null
         } ?: return null

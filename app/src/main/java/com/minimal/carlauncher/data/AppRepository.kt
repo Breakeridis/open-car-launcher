@@ -102,7 +102,7 @@ class AppRepository(context: Context, private val scope: CoroutineScope) {
         entries
             .filter { it.packageName != BuildConfig.APPLICATION_ID }
             .distinctBy { it.key }
-            .sortedWith { a, b -> collator.compare(a.label, b.label) }
+            .sortedWith(Comparator<AppEntry> { a, b -> collator.compare(a.label, b.label) })
     }
 
     private fun queryViaLauncherApps(): List<AppEntry> = try {
