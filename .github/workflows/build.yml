@@ -52,7 +52,7 @@ jobs:
           path: app/build/reports/tests/
 
   release:
-    name: Publish signed release APK
+    name: Publish release APK
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -70,17 +70,27 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      # The in-app updater can only install an APK signed with the SAME key as the build
-      # already on the device. Keep these secrets stable for the life of the app: rotating
-      # them forces every user to uninstall and reinstall.
-      - name: Restore signing keystore
+      # Signing is optional so early tags can still publish something installable.
+      # Once KEYSTORE_BASE64 exists this switches to a properly signed build with no
+      # further edits. NOTE: the in-app updater can only replace a build signed with the
+      # SAME key, so debug-signed releases cannot be upgraded in place.
+      - name: Detect signing material
+        id: signing
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::KEYSTORE_BASE64 secret is not set - a release build would be unsigned and uninstallable."
-            exit 1
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No KEYSTORE_BASE64 secret - publishing a debug-signed APK. The in-app updater cannot upgrade in place until releases are signed with a stable key."
           fi
+
+      - name: Restore signing keystore
+        if: steps.signing.outputs.signed == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
           echo "$KEYSTORE_BASE64" | base64 -d > release.jks
           cat > keystore.properties <<EOF
           storeFile=../release.jks
@@ -89,20 +99,30 @@ jobs:
           keyPassword=${{ secrets.KEY_PASSWORD }}
           EOF
 
-      - name: Assemble release APK
-        run: gradle --no-daemon :app:assembleRelease
-
-      - name: Rename APK to include the version
+      - name: Assemble signed release APK
+        if: steps.signing.outputs.signed == 'true'
         run: |
+          gradle --no-daemon :app:assembleRelease
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk \
-             "dist/car-launcher-${GITHUB_REF_NAME}-release.apk"
+             "dist/car-launcher-${GITHUB_REF_NAME}.apk"
+
+      - name: Assemble debug APK (unsigned release fallback)
+        if: steps.signing.outputs.signed != 'true'
+        run: |
+          gradle --no-daemon :app:assembleDebug
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "dist/car-launcher-${GITHUB_REF_NAME}-debug.apk"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.apk
           generate_release_notes: true
+          prerelease: ${{ startsWith(github.ref_name, 'v0.') }}
+          body: |
+            ${{ steps.signing.outputs.signed == 'true' && 'Signed release build.' || '**Debug-signed build.** Early development: no release keystore is configured yet, so the in-app updater cannot upgrade over this build. Uninstall any previous version before installing.' }}
 
       - name: Clean up signing material
         if: always()

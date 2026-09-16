@@ -59,6 +59,9 @@ cp keystore.properties.sample keystore.properties   # then fill it in
 Both files are git-ignored. For CI, set these repository secrets:
 `KEYSTORE_BASE64` (`base64 -w0 release.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
 
+Until those secrets exist a `v*` tag still publishes, but with a debug-signed APK that the
+in-app updater cannot upgrade in place. Adding a real key later forces one reinstall.
+
 ### 3. Verify the projection package names
 
 The ZLink/AutoKit family is rebranded per dongle vendor, so package ids vary by firmware. On the
@@ -91,7 +94,7 @@ Then:
 ```
 
 CI (`.github/workflows/build.yml`) runs the tests and assembles a debug APK on every push, and on
-a `v*` tag builds a signed release APK and attaches it to a GitHub release — which is exactly what
+a `v*` tag publishes an APK to a GitHub release (signed when the keystore secrets exist, debug-signed otherwise) — which is exactly what
 the in-app updater then finds.
 
 ## Installing it as the home screen
