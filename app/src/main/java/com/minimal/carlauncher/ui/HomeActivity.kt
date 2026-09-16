@@ -228,6 +228,8 @@ class HomeActivity : AppCompatActivity() {
     private fun openSettings() {
         SettingsDialog.show(
             activity = this,
+            repository = app.appRepository,
+            scope = lifecycleScope,
             onDockReset = { dock.reset() },
             onPrefsChanged = {
                 viewModel.refreshPrefs()
@@ -266,6 +268,41 @@ class HomeActivity : AppCompatActivity() {
         viewModel.refreshPrefs()
         cards.refreshLabels()
         render(viewModel.vehicle.value)
+        maybeAutoStartDashcam()
+    }
+
+    /**
+     * Starts the DVR app once per launcher process so its floating overlay comes up on the
+     * dashboard. Deliberately delayed: launching anything before the home screen has drawn
+     * makes a head unit look like it is booting into the wrong app.
+     */
+    private fun maybeAutoStartDashcam() {
+        if (app.dashcamAutoStartDone || !Prefs.dashcamAutoStart) return
+        val stored = Prefs.dashcamPackage ?: return
+        app.dashcamAutoStartDone = true
+
+        binding.root.postDelayed({
+            if (!IntentUtil.launchStored(this, stored, null)) {
+                Prefs.dashcamPackage = null
+                toast(getString(R.string.app_not_installed))
+                return@postDelayed
+            }
+            if (Prefs.dashcamReturnHome) {
+                // Best effort. Android 10+ restricts background activity starts, so some ROMs
+                // will drop this and the user presses HOME once instead.
+                binding.root.postDelayed({ returnToDashboard() }, DASHCAM_RETURN_DELAY_MS)
+            }
+        }, DASHCAM_START_DELAY_MS)
+    }
+
+    private fun returnToDashboard() {
+        val intent = Intent(this, HomeActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Blocked by the background-activity-start policy; nothing useful to do.
+        }
     }
 
     override fun onPause() {
@@ -294,5 +331,7 @@ class HomeActivity : AppCompatActivity() {
         /** ~5 km/h. */
         const val MOVING_MPS = 1.4f
         const val STALE_RETURN_MS = 30_000L
+        const val DASHCAM_START_DELAY_MS = 1_500L
+        const val DASHCAM_RETURN_DELAY_MS = 3_000L
     }
 }

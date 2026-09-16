@@ -69,6 +69,13 @@
     <string name="settings_compass">Compass detail</string>
     <string name="compass_8">8 points (N, NE, E…)</string>
     <string name="compass_16">16 points (N, NNE, NE…)</string>
+    <string name="settings_dashcam">Dashcam / DVR</string>
+    <string name="settings_dashcam_app">Dashcam app: %1$s</string>
+    <string name="settings_dashcam_none">none</string>
+    <string name="settings_dashcam_autostart">Start it when the launcher starts</string>
+    <string name="settings_dashcam_return">Return to the dashboard afterwards</string>
+    <string name="settings_dashcam_hint">The DVR app draws its own floating window — drag it once into free dashboard space and it should stay there.</string>
+    <string name="pick_dashcam_app">Choose your dashcam / DVR app</string>
     <string name="settings_reset_dock">Reset dock to empty</string>
     <string name="settings_home_app">Set as Home app</string>
     <string name="dock_reset">Dock cleared</string>

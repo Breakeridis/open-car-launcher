@@ -25,6 +25,13 @@ class CarLauncherApp : Application() {
     lateinit var updateRepository: UpdateRepository
         private set
 
+    /**
+     * Held in memory rather than in prefs so the dashcam is started once per launcher process.
+     * The launcher process starts at boot and stays alive, so in practice that is once per boot,
+     * and it survives the activity recreate that a theme switch causes.
+     */
+    var dashcamAutoStartDone = false
+
     override fun onCreate() {
         super.onCreate()
 

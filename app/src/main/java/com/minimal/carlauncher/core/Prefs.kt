@@ -23,6 +23,9 @@ object Prefs {
     const val KEY_MUSIC_PACKAGE = "pref_music_package"
     const val KEY_PROJECTION_PACKAGE = "pref_projection_package"
     const val KEY_DOCK_SLOTS = "pref_dock_slots"
+    const val KEY_DASHCAM_PACKAGE = "pref_dashcam_package"
+    const val KEY_DASHCAM_AUTOSTART = "pref_dashcam_autostart"
+    const val KEY_DASHCAM_RETURN_HOME = "pref_dashcam_return_home"
     const val KEY_LAST_SEEN_TAG = "pref_last_seen_release_tag"
     const val KEY_LAST_CHECK_MS = "pref_last_update_check_ms"
     const val KEY_CACHED_TAG = "pref_cached_latest_tag"
@@ -68,6 +71,24 @@ object Prefs {
     var projectionPackage: String?
         get() = sp.getString(KEY_PROJECTION_PACKAGE, null)?.ifBlank { null }
         set(value) = sp.edit().putString(KEY_PROJECTION_PACKAGE, value).apply()
+
+    /** Dashcam / DVR app started once per launcher process so its overlay is up. */
+    var dashcamPackage: String?
+        get() = sp.getString(KEY_DASHCAM_PACKAGE, null)?.ifBlank { null }
+        set(value) = sp.edit().putString(KEY_DASHCAM_PACKAGE, value).apply()
+
+    var dashcamAutoStart: Boolean
+        get() = sp.getBoolean(KEY_DASHCAM_AUTOSTART, false)
+        set(value) = sp.edit().putBoolean(KEY_DASHCAM_AUTOSTART, value).apply()
+
+    /**
+     * Try to bring the dashboard back after launching the dashcam. Best-effort: Android 10+
+     * restricts background activity starts, so some ROMs will ignore it and the user simply
+     * presses HOME once.
+     */
+    var dashcamReturnHome: Boolean
+        get() = sp.getBoolean(KEY_DASHCAM_RETURN_HOME, true)
+        set(value) = sp.edit().putBoolean(KEY_DASHCAM_RETURN_HOME, value).apply()
 
     var dockSlots: List<String>
         get() = DockCodec.decode(sp.getString(KEY_DOCK_SLOTS, null))

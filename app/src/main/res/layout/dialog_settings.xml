@@ -118,6 +118,47 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/cockpit_divider" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_dashcam" />
+
+        <Button
+            android:id="@+id/btnDashcamApp"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" />
+
+        <CheckBox
+            android:id="@+id/checkDashcamAutostart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/settings_dashcam_autostart" />
+
+        <CheckBox
+            android:id="@+id/checkDashcamReturn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/settings_dashcam_return" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_dashcam_hint"
+            android:textColor="@color/cockpit_text_dim"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="4dp"
             android:background="@color/cockpit_divider" />
 
