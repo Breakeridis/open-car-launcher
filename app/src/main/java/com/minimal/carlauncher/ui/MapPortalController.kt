@@ -28,7 +28,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.TilesOverlay
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import kotlin.math.abs
 
 /**
@@ -210,7 +211,7 @@ class MapPortalController(
         val tiles = mapView.overlayManager.tilesOverlay
         // OSM's standard style has no night variant; inverting it gives a dark map with light
         // roads, which keeps the cockpit dark instead of a bright disc in the middle of it.
-        tiles.setColorFilter(if (night) TilesOverlay.INVERTED_COLORS else null)
+        tiles.setColorFilter(if (night) NIGHT_TILES else null)
         val bg = ContextCompat.getColor(activity, R.color.cockpit_surface_alt)
         tiles.setLoadingBackgroundColor(bg)
         tiles.setLoadingLineColor(bg)
@@ -335,6 +336,18 @@ class MapPortalController(
     private companion object {
         /** Smaller rotations are invisible at a glance and would only cost redraws. */
         const val HEADING_STEP_DEG = 2f
+
+        /** Colour inversion: light roads on a dark background, slightly dimmed for night. */
+        val NIGHT_TILES = ColorMatrixColorFilter(
+            ColorMatrix(
+                floatArrayOf(
+                    -0.9f, 0f, 0f, 0f, 235f,
+                    0f, -0.9f, 0f, 0f, 235f,
+                    0f, 0f, -0.9f, 0f, 235f,
+                    0f, 0f, 0f, 1f, 0f
+                )
+            )
+        )
 
         fun angleDelta(a: Float, b: Float): Float {
             val d = abs(Format.normalizeDegrees(a) - Format.normalizeDegrees(b))
