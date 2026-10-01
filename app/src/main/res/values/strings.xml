@@ -138,6 +138,9 @@
     <string name="settings_radio_auto">detect automatically</string>
     <string name="radio_diagnostics">Radio diagnostics</string>
     <string name="radio_diagnostics_refresh">Refresh</string>
+    <string name="radio_inspect">Inspect radio app</string>
+    <string name="radio_inspecting">Inspecting the radio app…</string>
+    <string name="radio_inspect_hint">Change station on the radio, then tap Refresh: values that change reveal how it shares the frequency. Screenshot every page.</string>
     <string name="settings_radio_access">Allow radio sync (notification access)</string>
     <string name="settings_vehicle">Vehicle settings button</string>
     <string name="settings_vehicle_app">Opens: %1$s</string>

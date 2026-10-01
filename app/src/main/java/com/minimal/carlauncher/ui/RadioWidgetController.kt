@@ -17,12 +17,14 @@ import com.minimal.carlauncher.core.Prefs
 import com.minimal.carlauncher.core.RadioFrequency
 import com.minimal.carlauncher.data.AppRepository
 import com.minimal.carlauncher.databinding.ActivityHomeBinding
+import com.minimal.carlauncher.radio.ApkInspector
 import com.minimal.carlauncher.radio.MediaSessionListener
 import com.minimal.carlauncher.radio.RadioRepository
 import com.minimal.carlauncher.radio.RadioState
 import com.minimal.carlauncher.radio.TuneResult
 import com.minimal.carlauncher.util.IntentUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * The FM/AM tuner widget: live frequency + RDS, seek buttons, four presets.
@@ -254,7 +256,49 @@ class RadioWidgetController(
                 radio.reselect()
                 showDiagnostics()
             }
+            .setNegativeButton(R.string.radio_inspect) { _, _ -> showInspection() }
             .show()
+    }
+
+    /**
+     * Looks inside the radio app itself (manifest, code strings, settings values) - for tuners
+     * like com.nwd.radio that publish neither a media session nor a notification.
+     */
+    private fun showInspection() {
+        val pkg = radioPackage()
+        if (pkg == null) {
+            pickRadioApp()
+            return
+        }
+        val text = monospaceText(activity.getString(R.string.radio_inspecting))
+        val dialog = AlertDialog.Builder(activity)
+            .setTitle(R.string.radio_inspect)
+            .setView(android.widget.ScrollView(activity).apply { addView(text) })
+            .setPositiveButton(R.string.action_close, null)
+            .setNeutralButton(R.string.radio_diagnostics_refresh, null)
+            .show()
+
+        fun inspectNow() {
+            text.text = activity.getString(R.string.radio_inspecting)
+            scope.launch {
+                val report = ApkInspector.inspect(activity, pkg)
+                text.text = activity.getString(R.string.radio_inspect_hint) + "\n\n" + report
+            }
+        }
+        // Refresh re-runs in place instead of closing, so values can be compared station to station.
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener { inspectNow() }
+        inspectNow()
+    }
+
+    private fun monospaceText(initial: String): TextView {
+        val pad = (16 * activity.resources.displayMetrics.density).toInt()
+        return TextView(activity).apply {
+            setPadding(pad, pad, pad, pad)
+            typeface = android.graphics.Typeface.MONOSPACE
+            textSize = 12f
+            setTextIsSelectable(true)
+            text = initial
+        }
     }
 
     private fun toast(resId: Int) {

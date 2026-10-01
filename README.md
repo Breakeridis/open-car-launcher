@@ -188,6 +188,13 @@ a new tuner app.
   frequency the tuner reports afterwards and says so (*"The radio app did not accept direct
   tuning"*) rather than pretending it worked.
 
+**When the radio publishes nothing at all** — the case for the NWD K2401P's stock tuner,
+`com.nwd.radio`, which has no media session and no notification — Radio diagnostics →
+*Inspect radio app* looks inside the tuner instead. It reads the tuner APK's manifest (exported
+receivers, services and providers, and their intent-filter actions), the vendor names in its
+code, and any radio-related `Settings` values. Change station and tap *Refresh*: whatever changes
+is the channel the frequency travels on. No adb needed.
+
 ### Vehicle settings and projection apps are vendor apps
 
 Long-press the system dock's ⚙ → *Vehicle settings button* to point it at the factory car-settings
