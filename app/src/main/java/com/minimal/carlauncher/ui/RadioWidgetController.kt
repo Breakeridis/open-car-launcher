@@ -235,6 +235,28 @@ class RadioWidgetController(
             .show()
     }
 
+    /** What the launcher can see of the tuner - screenshot this when the widget stays empty. */
+    fun showDiagnostics() {
+        val pad = (16 * activity.resources.displayMetrics.density).toInt()
+        val text = TextView(activity).apply {
+            setPadding(pad, pad, pad, pad)
+            typeface = android.graphics.Typeface.MONOSPACE
+            textSize = 12f
+            setTextIsSelectable(true)
+            this.text = radio.diagnostics()
+        }
+        val scroll = android.widget.ScrollView(activity).apply { addView(text) }
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.radio_diagnostics)
+            .setView(scroll)
+            .setPositiveButton(R.string.action_close, null)
+            .setNeutralButton(R.string.radio_diagnostics_refresh) { _, _ ->
+                radio.reselect()
+                showDiagnostics()
+            }
+            .show()
+    }
+
     private fun toast(resId: Int) {
         Toast.makeText(activity, resId, Toast.LENGTH_SHORT).show()
     }

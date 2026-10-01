@@ -41,6 +41,7 @@ object Prefs {
     const val KEY_MAP_LON = "pref_map_lon"
     const val KEY_MAP_ZOOM = "pref_map_zoom"
     const val KEY_MAP_HEADING_UP = "pref_map_heading_up"
+    const val KEY_LAST_COURSE = "pref_last_course_deg"
 
     const val COMPASS_AUTO = "auto"
     const val COMPASS_GPS = "gps"
@@ -177,6 +178,11 @@ object Prefs {
             .putFloat(KEY_MAP_ZOOM, zoom.toFloat())
             .apply()
     }
+
+    /** Last GPS course in degrees, or null. Restores the map arrow's direction after a reboot. */
+    var lastCourseDeg: Float?
+        get() = sp.getFloat(KEY_LAST_COURSE, -1f).takeIf { it in 0f..360f }
+        set(value) = sp.edit().putFloat(KEY_LAST_COURSE, value ?: -1f).apply()
 
     /** True = map rotates so travel direction is up; false = north-up. */
     var mapHeadingUp: Boolean

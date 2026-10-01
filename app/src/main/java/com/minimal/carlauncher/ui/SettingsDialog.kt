@@ -24,6 +24,7 @@ object SettingsDialog {
         onDockReset: () -> Unit,
         onPickRadioApp: () -> Unit,
         onRadioAccess: () -> Unit,
+        onRadioDiagnostics: () -> Unit,
         onPrefsChanged: () -> Unit
     ) {
         val view = LayoutInflater.from(activity).inflate(R.layout.dialog_settings, null, false)
@@ -90,6 +91,10 @@ object SettingsDialog {
         view.findViewById<Button>(R.id.btnRadioAccess).setOnClickListener {
             dialog.dismiss()
             onRadioAccess()
+        }
+        view.findViewById<Button>(R.id.btnRadioDiagnostics).setOnClickListener {
+            dialog.dismiss()
+            onRadioDiagnostics()
         }
 
         // --- vehicle settings button ---

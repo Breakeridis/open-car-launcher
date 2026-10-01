@@ -9,8 +9,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Overlay
 
 /**
- * The car locator: an arrow at the vehicle position pointing along its heading, or a dot
- * when no heading is known.
+ * The car locator: an arrow at the vehicle position pointing along its heading.
  *
  * Drawn as a map overlay (not a view pinned to the portal centre) so it stays on the car
  * while the driver pans away. The canvas osmdroid hands to overlays is already rotated by the
@@ -52,15 +51,15 @@ class VehicleOverlay(fillColor: Int, outlineColor: Int, private val sizePx: Floa
 
         canvas.save()
         canvas.translate(screen.x.toFloat(), screen.y.toFloat())
+        // Always an arrow - it is a car. With no direction known yet (first drive after
+        // install, no compass) it points north, half transparent, until the car has moved.
         val heading = headingDeg
-        if (heading != null) {
-            canvas.rotate(heading)
-            canvas.drawPath(arrow, outline)
-            canvas.drawPath(arrow, fill)
-        } else {
-            canvas.drawCircle(0f, 0f, sizePx * 0.32f, outline)
-            canvas.drawCircle(0f, 0f, sizePx * 0.32f, fill)
-        }
+        val alpha = if (heading != null) 255 else 128
+        fill.alpha = alpha
+        outline.alpha = alpha
+        canvas.rotate(heading ?: 0f)
+        canvas.drawPath(arrow, outline)
+        canvas.drawPath(arrow, fill)
         canvas.restore()
     }
 }

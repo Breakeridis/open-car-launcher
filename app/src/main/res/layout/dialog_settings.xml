@@ -141,6 +141,13 @@
             android:layout_height="wrap_content"
             android:text="@string/settings_radio_access" />
 
+        <Button
+            android:id="@+id/btnRadioDiagnostics"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_diagnostics" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

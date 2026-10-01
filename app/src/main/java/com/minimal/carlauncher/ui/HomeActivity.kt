@@ -300,6 +300,7 @@ class HomeActivity : AppCompatActivity() {
             onDockReset = { dock.reset() },
             onPickRadioApp = { radioWidget.pickRadioApp() },
             onRadioAccess = { radioWidget.requestSessionAccess() },
+            onRadioDiagnostics = { radioWidget.showDiagnostics() },
             onPrefsChanged = {
                 viewModel.refreshPrefs()
                 lastCardinal = null

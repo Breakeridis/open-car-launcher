@@ -47,6 +47,14 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private var lastFixElapsedMs = 0L
     private var sensorHeading: Float? = null
 
+    /**
+     * Last GPS course, held while the car is stopped (and across reboots), so the map shows
+     * the way the car points instead of losing direction at every traffic light. Most head
+     * units have no magnetometer, so without this there would be no heading at all at rest.
+     */
+    private var courseHeading: Float? = Prefs.lastCourseDeg
+    private var courseAnchor: Location? = null
+
     /** Called from onResume. Nothing is registered while another app is in the foreground. */
     fun start() {
         if (locationJob == null && speedProvider.hasPermission) {
@@ -54,6 +62,7 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
                 speedProvider.locations().collect { location ->
                     lastLocation = location
                     lastFixElapsedMs = SystemClock.elapsedRealtime()
+                    updateCourse(location)
                     publish()
                 }
             }
@@ -84,6 +93,32 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         locationJob?.cancel(); locationJob = null
         compassJob?.cancel(); compassJob = null
         tickerJob?.cancel(); tickerJob = null
+        Prefs.lastCourseDeg = courseHeading
+    }
+
+    /**
+     * Course from the receiver when it reports one while moving; otherwise computed from two
+     * fixes far enough apart to beat position noise - some GNSS chips report speed but never
+     * a bearing.
+     */
+    private fun updateCourse(location: Location) {
+        val speed = speedProvider.speedOf(location)
+        if (location.hasBearing() && speed > Constants.GPS_BEARING_MIN_MPS) {
+            courseHeading = location.bearing
+            courseAnchor = location
+            return
+        }
+        val anchor = courseAnchor
+        if (anchor == null) {
+            courseAnchor = location
+            return
+        }
+        val distance = anchor.distanceTo(location)
+        val noise = if (location.hasAccuracy()) location.accuracy else 10f
+        if (distance >= COURSE_MIN_DISTANCE_M && distance > noise * 2f) {
+            courseHeading = Format.normalizeDegrees(anchor.bearingTo(location))
+            courseAnchor = location
+        }
     }
 
     /** Re-checks the permission after the runtime dialog and starts the GPS session if granted. */
@@ -120,12 +155,24 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         val gpsUsable = hasFix && location != null &&
             location.hasBearing() && speedMps > Constants.GPS_BEARING_MIN_MPS
 
-        if (gpsUsable && preference != Prefs.COMPASS_SENSOR) {
-            heading = location!!.bearing
-            source = HeadingSource.GPS
-        } else if (preference != Prefs.COMPASS_GPS) {
-            sensorHeading?.let {
-                heading = it
+        val sensor = if (preference != Prefs.COMPASS_GPS) sensorHeading else null
+        when {
+            gpsUsable && preference != Prefs.COMPASS_SENSOR -> {
+                heading = location!!.bearing
+                source = HeadingSource.GPS
+            }
+            preference == Prefs.COMPASS_SENSOR && sensor != null -> {
+                heading = sensor
+                source = HeadingSource.SENSOR
+            }
+            // Held / computed course beats a stationary magnetometer reading: it is where the
+            // car actually points, not a guess distorted by the dashboard's metal and magnets.
+            courseHeading != null -> {
+                heading = courseHeading
+                source = HeadingSource.GPS
+            }
+            sensor != null -> {
+                heading = sensor
                 source = HeadingSource.SENSOR
             }
         }
@@ -146,5 +193,10 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         super.onCleared()
         stop()
+    }
+
+    private companion object {
+        /** Two fixes closer than this are mostly GNSS noise, not a direction of travel. */
+        const val COURSE_MIN_DISTANCE_M = 15f
     }
 }

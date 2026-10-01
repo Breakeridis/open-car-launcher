@@ -106,3 +106,27 @@ class RadioMetadataTest {
         assertEquals("Jazz", r.radioText)
     }
 }
+
+class RadioActionsTest {
+
+    private fun idx(titles: List<String?>, up: Boolean) =
+        com.minimal.carlauncher.core.RadioActions.indexFor(titles, up)
+
+    @Test
+    fun `finds labelled seek buttons`() {
+        val titles = listOf("Previous", "Pause", "Next")
+        assertEquals(2, idx(titles, up = true))
+        assertEquals(0, idx(titles, up = false))
+        assertEquals(1, idx(listOf("Stop", "下一台", "上一台"), up = true))
+        assertEquals(2, idx(listOf("Stop", "下一台", "上一台"), up = false))
+    }
+
+    @Test
+    fun `falls back to position for unlabelled buttons`() {
+        assertEquals(2, idx(listOf(null, null, null), up = true))
+        assertEquals(0, idx(listOf("", "", ""), up = false))
+        assertEquals(1, idx(listOf(null, null), up = true))
+        assertNull(idx(listOf("Close"), up = true))
+        assertNull(idx(emptyList(), up = false))
+    }
+}

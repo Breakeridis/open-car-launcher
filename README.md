@@ -174,9 +174,16 @@ adb shell dumpsys media_session      # play the radio first; look for its packag
 If the radio's package name does not contain "radio"/"fm", long-press the frequency on the
 widget and pick it. What still depends on the vendor app:
 
-- **No media session at all** → the frequency cannot be read; seek still works through media
-  key events (the same path as the steering-wheel buttons), and presets fall back to opening the
-  radio app with a play-from-search intent.
+- **No media session at all** → the frequency and station are read from the radio app's ongoing
+  notification instead (standard text and custom layouts), and seek presses that notification's
+  previous / next buttons. Without a notification either, seek falls back to media key events
+  (the same path as the steering-wheel buttons), and presets open the radio app with a
+  play-from-search intent.
+
+**When the widget stays empty:** long-press ⚙ → *Radio diagnostics*. It lists the access state,
+every media session with its metadata, and the text and buttons of ongoing notifications
+(other notifications by package name only). A screenshot of it is enough to adapt the parser to
+a new tuner app.
 - **Session without `playFromSearch`** → presets cannot tune directly. The widget checks the
   frequency the tuner reports afterwards and says so (*"The radio app did not accept direct
   tuning"*) rather than pretending it worked.

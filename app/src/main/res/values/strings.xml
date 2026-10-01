@@ -126,6 +126,8 @@
     <string name="settings_radio">Radio</string>
     <string name="settings_radio_app">Radio app: %1$s</string>
     <string name="settings_radio_auto">detect automatically</string>
+    <string name="radio_diagnostics">Radio diagnostics</string>
+    <string name="radio_diagnostics_refresh">Refresh</string>
     <string name="settings_radio_access">Allow radio sync (notification access)</string>
     <string name="settings_vehicle">Vehicle settings button</string>
     <string name="settings_vehicle_app">Opens: %1$s</string>
