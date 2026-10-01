@@ -1,14 +1,12 @@
 package com.minimal.carlauncher.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.MotionEvent
-import android.view.inputmethod.EditorInfo
-import android.widget.EditText
+import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -21,20 +19,24 @@ import com.minimal.carlauncher.location.VehicleState
 import com.minimal.carlauncher.map.GeocodingClient
 import com.minimal.carlauncher.map.Place
 import com.minimal.carlauncher.map.VehicleOverlay
-import com.minimal.carlauncher.util.IntentUtil
+import com.minimal.carlauncher.nav.Geo
+import com.minimal.carlauncher.nav.LatLon
 import kotlinx.coroutines.launch
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
+import org.osmdroid.views.overlay.Overlay
+import java.util.Locale
 import kotlin.math.abs
 
 /**
  * The circular moving-map portal: follows the car, rotates heading-up (or stays north-up),
- * supports pan / pinch-zoom, recenter and address search.
+ * supports pan / pinch-zoom, recenter, address search, long-press pins and in-app navigation
+ * drawn on this map (no hand-off to another navigation app).
  *
  * Head-unit notes (Allwinner T507 / A133): the GPU is modest, so the map is only rotated when
  * the heading has moved by a visible amount, and only redrawn when something actually changed.
@@ -54,7 +56,15 @@ class MapPortalController(
         sizePx = activity.resources.getDimension(R.dimen.map_vehicle_size)
     )
 
-    private var destination: Marker? = null
+    /** The pinned place (search result or long-press) and its marker. */
+    private var pinned: Place? = null
+    private var destinationMarker: Marker? = null
+
+    private val search = MapSearchPanel(activity, binding) { place -> showPlace(place) }
+
+    private val navigator by lazy {
+        MapNavigator(activity, binding, mapView, this::addBelowCar) { onNavigationEnded() }
+    }
 
     /** False after the driver pans; the auto-recenter timer or the button turns it back on. */
     private var following = true
@@ -74,6 +84,14 @@ class MapPortalController(
         mapView.setMinZoomLevel(3.0)
         mapView.setMaxZoomLevel(19.0)
         mapView.setVerticalMapRepetitionEnabled(false)
+        // Long-press anywhere drops a pin. Index 0, so markers still get their own taps first.
+        mapView.overlays.add(0, MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean = false
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                p?.let { onLongPress(it) }
+                return p != null
+            }
+        }))
         mapView.overlays.add(vehicle)
 
         applyDayNight()
@@ -97,7 +115,9 @@ class MapPortalController(
         binding.btnMapSearch.setOnClickListener { openSearch() }
         binding.headingChip.setOnClickListener { toggleOrientation() }
 
+        search.bind()
         renderControls()
+        navigator.resumeIfSaved()
     }
 
     fun onResume() = mapView.onResume()
@@ -165,6 +185,8 @@ class MapPortalController(
         binding.compassBezel.northDeg = mapView.mapOrientation
 
         if (dirty) mapView.invalidate()
+
+        navigator.onVehicle(state)
     }
 
     // ------------------------------------------------------------------ following
@@ -217,7 +239,7 @@ class MapPortalController(
         tiles.setLoadingLineColor(bg)
     }
 
-    // --------------------------------------------------------------------- search
+    // ------------------------------------------------------- search, pins, navigation
 
     private fun openSearch() {
         // Typing an address is exactly the task a moving driver must not do.
@@ -225,108 +247,128 @@ class MapPortalController(
             toast(R.string.map_search_while_driving)
             return
         }
-        val input = EditText(activity).apply {
-            hint = activity.getString(R.string.map_search_hint)
-            setSingleLine()
-            imeOptions = EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI
-        }
-        val dialog = AlertDialog.Builder(activity)
-            .setTitle(R.string.map_search_title)
-            .setView(input)
-            .setPositiveButton(R.string.map_search_go) { _, _ -> runSearch(input.text.toString()) }
-            .setNegativeButton(R.string.action_cancel, null)
-            .create()
-        input.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                dialog.dismiss()
-                runSearch(input.text.toString())
-                true
-            } else {
-                false
-            }
-        }
-        dialog.show()
-        input.requestFocus()
+        search.open(lastPosition?.let { LatLon(it.latitude, it.longitude) })
     }
 
-    private fun runSearch(query: String) {
-        if (query.isBlank()) return
-        toast(R.string.map_searching)
-        val near = lastPosition
+    /** BACK closes the search panel first, then a pin card. True when it handled the press. */
+    fun handleBack(): Boolean {
+        if (search.isOpen) {
+            search.close()
+            return true
+        }
+        if (pinned != null && !navigator.isActive) {
+            clearPin()
+            return true
+        }
+        return false
+    }
+
+    /** HOME pressed: close the search panel, keep the pin and any active navigation. */
+    fun reset() {
+        if (search.isOpen) search.close()
+    }
+
+    private fun onLongPress(point: GeoPoint) {
+        mapView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        // Like a pan: stop following so the pin stays in view, snap back later.
+        onUserGesture()
+        val place = Place(
+            activity.getString(R.string.map_dropped_pin) + ", " + String.format(
+                Locale.US, "%.5f, %.5f", point.latitude, point.longitude
+            ),
+            point.latitude, point.longitude
+        )
+        showPlace(place, moveCamera = false)
+        // Replace the coordinates with a street address when one is available.
         activity.lifecycleScope.launch {
-            val results = try {
-                GeocodingClient.search(query, near?.latitude, near?.longitude)
-            } catch (e: Exception) {
-                toast(R.string.map_search_offline)
-                return@launch
+            val name = GeocodingClient.reverse(point.latitude, point.longitude) ?: return@launch
+            if (pinned?.latitude == place.latitude && pinned?.longitude == place.longitude) {
+                showPlace(Place(name, place.latitude, place.longitude), moveCamera = false)
             }
-            if (results.isEmpty()) {
-                toast(R.string.map_search_none)
-                return@launch
-            }
-            AlertDialog.Builder(activity)
-                .setTitle(query)
-                .setItems(results.map { it.name }.toTypedArray()) { _, which ->
-                    showPlace(results[which])
-                }
-                .setNegativeButton(R.string.action_cancel, null)
-                .show()
         }
     }
 
-    private fun showPlace(place: Place) {
+    private fun showPlace(place: Place, moveCamera: Boolean = true) {
+        pinned = place
         val point = GeoPoint(place.latitude, place.longitude)
-        destination?.let { mapView.overlays.remove(it) }
-        val pin = Marker(mapView).apply {
+        destinationMarker?.let { mapView.overlays.remove(it) }
+        val marker = Marker(mapView).apply {
             position = point
             title = place.name
+            icon = ContextCompat.getDrawable(activity, R.drawable.ic_place_marker)
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             // Returning true also suppresses osmdroid's default info bubble.
             setOnMarkerClickListener { _, _ ->
-                offerNavigation(place)
+                if (!navigator.isActive) showPlaceCard(place)
                 true
             }
         }
-        destination = pin
-        // Keep the car arrow drawn above the pin.
-        mapView.overlays.add(mapView.overlays.indexOf(vehicle).coerceAtLeast(0), pin)
+        destinationMarker = marker
+        addBelowCar(marker)
+        mapView.invalidate()
 
-        setFollowing(false)
-        mapView.removeCallbacks(autoRecenter)
-        mapView.controller.animateTo(point)
-        offerNavigation(place)
-    }
-
-    private fun offerNavigation(place: Place) {
-        AlertDialog.Builder(activity)
-            .setTitle(place.name)
-            .setPositiveButton(R.string.map_navigate) { _, _ -> navigateTo(place) }
-            .setNeutralButton(R.string.map_clear_pin) { _, _ ->
-                destination?.let { mapView.overlays.remove(it) }
-                destination = null
-                setFollowing(true)
-            }
-            .setNegativeButton(R.string.action_close) { _, _ ->
-                mapView.postDelayed(autoRecenter, Constants.MAP_AUTO_RECENTER_MS)
-            }
-            .show()
-    }
-
-    /** Hands the destination to the navigation app on the Navigation tile (or any geo: app). */
-    private fun navigateTo(place: Place) {
-        val label = Uri.encode(place.name.substringBefore(','))
-        val uri = Uri.parse(
-            String.format(
-                java.util.Locale.US, "geo:%.6f,%.6f?q=%.6f,%.6f(%s)",
-                place.latitude, place.longitude, place.latitude, place.longitude, label
-            )
-        )
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        Prefs.navPackage?.let { intent.setPackage(IntentUtil.packageOf(it)) }
-        if (!IntentUtil.startSafely(activity, intent)) {
-            intent.setPackage(null)
-            if (!IntentUtil.startSafely(activity, intent)) toast(R.string.map_no_nav_app)
+        if (moveCamera) {
+            setFollowing(false)
+            mapView.removeCallbacks(autoRecenter)
+            mapView.controller.animateTo(point)
         }
+        if (!navigator.isActive) showPlaceCard(place)
+    }
+
+    private fun showPlaceCard(place: Place) {
+        binding.mapCard.visibility = View.VISIBLE
+        binding.headingChip.visibility = View.GONE
+        binding.cardGlyph.visibility = View.GONE
+        binding.cardTitle.text = place.title
+        binding.cardSubtitle.text = place.subtitle
+        binding.cardSubtitle.visibility = if (place.subtitle.isBlank()) View.GONE else View.VISIBLE
+        val from = lastPosition
+        if (from != null) {
+            binding.cardSummary.text = Format.distanceText(
+                Prefs.speedUnit,
+                Geo.distanceM(LatLon(from.latitude, from.longitude), LatLon(place.latitude, place.longitude))
+            )
+            binding.cardSummary.visibility = View.VISIBLE
+        } else {
+            binding.cardSummary.visibility = View.GONE
+        }
+        binding.btnCardPrimary.visibility = View.VISIBLE
+        binding.btnCardPrimary.setOnClickListener { startNavigation(place) }
+        binding.btnCardSecondary.setText(R.string.map_clear_pin)
+        binding.btnCardSecondary.setOnClickListener { clearPin() }
+    }
+
+    private fun startNavigation(place: Place) {
+        binding.cardSubtitle.visibility = View.VISIBLE
+        navigator.start(place)
+        // Guidance view: follow the car, heading-up if chosen, close enough to read turns.
+        if (mapView.zoomLevelDouble < NAV_MIN_ZOOM) mapView.controller.setZoom(NAV_ZOOM)
+        setFollowing(true)
+    }
+
+    private fun clearPin() {
+        destinationMarker?.let { mapView.overlays.remove(it) }
+        destinationMarker = null
+        pinned = null
+        hideCard()
+        mapView.invalidate()
+        setFollowing(true)
+    }
+
+    private fun onNavigationEnded() {
+        clearPin()
+    }
+
+    private fun hideCard() {
+        binding.mapCard.visibility = View.GONE
+        binding.headingChip.visibility = View.VISIBLE
+        binding.cardSubtitle.visibility = View.VISIBLE
+    }
+
+    /** Route lines and pins go below the car arrow, so the car is never hidden. */
+    private fun addBelowCar(overlay: Overlay) {
+        val index = mapView.overlays.indexOf(vehicle)
+        if (index < 0) mapView.overlays.add(overlay) else mapView.overlays.add(index, overlay)
     }
 
     private fun toast(resId: Int) {
@@ -336,6 +378,10 @@ class MapPortalController(
     private companion object {
         /** Smaller rotations are invisible at a glance and would only cost redraws. */
         const val HEADING_STEP_DEG = 2f
+
+        /** Guidance zoom: individual junctions readable. */
+        const val NAV_ZOOM = 16.5
+        const val NAV_MIN_ZOOM = 15.0
 
         /** Colour inversion: light roads on a dark background, slightly dimmed for night. */
         val NIGHT_TILES = ColorMatrixColorFilter(

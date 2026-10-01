@@ -69,6 +69,36 @@ object Format {
         return if (abs(delta) <= sector / 2f + marginDeg) previous else fresh
     }
 
+    /**
+     * Road distance in the same unit family as the speedometer: "350 m" / "2.4 km", or
+     * "0.2 mi" / "12 mi". Rounded the way a driver reads it - coarser the further it is.
+     */
+    fun distanceText(unit: String, metres: Double): String {
+        if (unit == UNIT_MPH) {
+            val miles = metres / 1609.344
+            return when {
+                miles < 0.1 -> "${(metres * 3.28084 / 50).roundToInt() * 50} ft"
+                miles < 10 -> String.format(java.util.Locale.US, "%.1f mi", miles)
+                else -> "${miles.roundToInt()} mi"
+            }
+        }
+        return when {
+            metres < 1_000 -> "${((metres / 10).roundToInt() * 10).coerceAtLeast(0)} m"
+            metres < 10_000 -> String.format(java.util.Locale.US, "%.1f km", metres / 1000)
+            else -> "${(metres / 1000).roundToInt()} km"
+        }
+    }
+
+    /** "45 s", "18 min", "1 h 05 min". */
+    fun durationText(seconds: Double): String {
+        val s = seconds.roundToInt().coerceAtLeast(0)
+        return when {
+            s < 60 -> "$s s"
+            s < 3_600 -> "${(s + 30) / 60} min"
+            else -> String.format(java.util.Locale.US, "%d h %02d min", s / 3_600, (s % 3_600) / 60)
+        }
+    }
+
     fun byteProgressText(bytes: Long, total: Long): String {
         val mbDone = bytes / 1_048_576.0
         return if (total > 0) {

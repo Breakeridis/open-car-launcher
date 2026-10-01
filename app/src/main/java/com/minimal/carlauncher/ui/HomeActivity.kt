@@ -166,7 +166,7 @@ class HomeActivity : AppCompatActivity() {
     private fun bindBackBehaviour() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (drawer.isOpen) drawer.close()
+                if (drawer.isOpen) drawer.close() else map.handleBack()
             }
         })
     }
@@ -400,6 +400,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun resetToDashboard() {
         drawer.reset()
+        map.reset()
     }
 
     private fun toast(message: String) {

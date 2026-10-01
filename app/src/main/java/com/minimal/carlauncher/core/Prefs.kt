@@ -42,6 +42,7 @@ object Prefs {
     const val KEY_MAP_ZOOM = "pref_map_zoom"
     const val KEY_MAP_HEADING_UP = "pref_map_heading_up"
     const val KEY_LAST_COURSE = "pref_last_course_deg"
+    const val KEY_NAV_DESTINATION = "pref_nav_destination"
 
     const val COMPASS_AUTO = "auto"
     const val COMPASS_GPS = "gps"
@@ -183,6 +184,14 @@ object Prefs {
     var lastCourseDeg: Float?
         get() = sp.getFloat(KEY_LAST_COURSE, -1f).takeIf { it in 0f..360f }
         set(value) = sp.edit().putFloat(KEY_LAST_COURSE, value ?: -1f).apply()
+
+    /**
+     * Active navigation destination as "lat|lon|name", so a trip survives the ignition being
+     * switched off at a fuel stop. Empty when not navigating.
+     */
+    var navDestination: String
+        get() = sp.getString(KEY_NAV_DESTINATION, "") ?: ""
+        set(value) = sp.edit().putString(KEY_NAV_DESTINATION, value).apply()
 
     /** True = map rotates so travel direction is up; false = north-up. */
     var mapHeadingUp: Boolean

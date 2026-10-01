@@ -27,7 +27,7 @@ in-dash panel. It runs on any landscape Android 10+ head unit; see
 |---|---|---|
 | 1 | **Clock & calendar** | Large HH:mm with a running seconds counter, localized weekday and date. Tap opens the clock / alarm app. |
 | 2 | **FM/AM radio** | Live frequency, band and RDS station name / radio text read from the native tuner. Tap `−`/`+` to seek, long-press to step one channel. Four presets: tap to tune, long-press to store the current station (persisted). Tap the frequency to open the radio app, long-press to choose which app that is. |
-| 3 | **Map portal** | Circular OpenStreetMap view following the car, rotating compass bezel, heading-up or north-up (tap the heading chip), pan / pinch-zoom, recenter, address search (Nominatim) with hand-off to the navigation app. Night mode darkens the tiles. Snaps back to the car 20 s after you stop panning. |
+| 3 | **Map portal** | Circular OpenStreetMap view following the car, rotating compass bezel, heading-up or north-up (tap the heading chip), pan / pinch-zoom, recenter. Address search (Nominatim) in a full-screen panel, or long-press the map to drop a pin. **Navigate** routes on this map (OSRM): route line, next-turn card with distance, remaining distance / time / ETA, automatic rerouting, and a trip that survives switching the ignition off. Night mode darkens the tiles. Snaps back to the car 20 s after you stop panning. |
 | 4 | **Speed HUD** | Large GPS speed inside the portal; tap to toggle KM/H ↔ MPH. GPS lock indicator underneath. |
 | 5 | **Phone projection** | Auto-detects ZLink / AutoKit / EasyConnection / Headunit Reloaded; tap launches, long-press re-assigns. |
 | 6 | **Navigation & music** | Tap launches, long-press binds any installed app. |
@@ -204,7 +204,12 @@ command under [Verify the projection package names](#3-verify-the-projection-pac
 - The Mali-G31 / PowerVR GE8300 GPUs in these SoCs are modest: the map is clipped with an outline
   (not `clipPath`), only re-rotated when the heading moves by ≥ 2°, and only redrawn when
   something changed. Tile downloads are limited to two threads.
-- Address search is disabled above ~5 km/h, like the update prompt.
+- Address search is disabled above ~5 km/h, like the update prompt. Long-press pins and the
+  Navigate button work at any speed (one tap each).
+- Routes come from the public OSRM demo server (`router.project-osrm.org`), which is fine for
+  one car but has a fair-use policy; for a fleet, point `RoutingClient.ENDPOINT` at your own
+  OSRM instance. Only routing and rerouting need a connection: following the route, the
+  next-turn readout and arrival are computed on the unit.
 
 ## Verifying on a device
 

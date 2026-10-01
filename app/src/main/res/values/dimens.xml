@@ -61,4 +61,15 @@
     <dimen name="search_text">18sp</dimen>
     <dimen name="picker_icon">40dp</dimen>
     <dimen name="picker_label_text">17sp</dimen>
+
+    <!-- Map search, pins and navigation card -->
+    <dimen name="map_pin_size">40dp</dimen>
+    <dimen name="map_card_side_margin">24dp</dimen>
+    <dimen name="place_row_min_height">64dp</dimen>
+    <dimen name="place_title_text">17sp</dimen>
+    <dimen name="place_subtitle_text">13sp</dimen>
+    <dimen name="nav_glyph_text">40sp</dimen>
+    <dimen name="nav_title_text">26sp</dimen>
+    <dimen name="nav_subtitle_text">15sp</dimen>
+    <dimen name="nav_button_height">48dp</dimen>
 </resources>

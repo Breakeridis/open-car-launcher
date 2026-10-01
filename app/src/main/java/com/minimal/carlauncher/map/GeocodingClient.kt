@@ -9,7 +9,13 @@ import java.net.URL
 import java.net.URLEncoder
 import java.util.Locale
 
-data class Place(val name: String, val latitude: Double, val longitude: Double)
+data class Place(val name: String, val latitude: Double, val longitude: Double) {
+    /** First part of the address ("Grote Markt"), for headings. */
+    val title: String get() = name.substringBefore(',').trim()
+
+    /** The rest of the address ("Antwerpen, Vlaanderen, België"). */
+    val subtitle: String get() = name.substringAfter(',', "").trim()
+}
 
 /**
  * Address / POI search through OpenStreetMap's Nominatim - no API key and no Google Play
@@ -21,6 +27,7 @@ data class Place(val name: String, val latitude: Double, val longitude: Double)
 object GeocodingClient {
 
     private const val ENDPOINT = "https://nominatim.openstreetmap.org/search"
+    private const val REVERSE_ENDPOINT = "https://nominatim.openstreetmap.org/reverse"
     private const val TIMEOUT_MS = 10_000
 
     /** @throws java.io.IOException when offline or the server misbehaves. */
@@ -57,6 +64,37 @@ object GeocodingClient {
                 connection.disconnect()
             }
         }
+
+    /** Name of the address at a point (for long-press pins). Null when offline or unknown. */
+    suspend fun reverse(lat: Double, lon: Double): String? = withContext(Dispatchers.IO) {
+        try {
+            val url = String.format(
+                Locale.US, "%s?format=jsonv2&zoom=18&lat=%.6f&lon=%.6f&accept-language=%s",
+                REVERSE_ENDPOINT, lat, lon,
+                URLEncoder.encode(Locale.getDefault().toLanguageTag(), "UTF-8")
+            )
+            val connection = URL(url).openConnection() as HttpURLConnection
+            try {
+                connection.connectTimeout = TIMEOUT_MS
+                connection.readTimeout = TIMEOUT_MS
+                connection.setRequestProperty(
+                    "User-Agent", "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME}"
+                )
+                if (connection.responseCode !in 200..299) return@withContext null
+                parseReverse(connection.inputStream.bufferedReader().use { it.readText() })
+            } finally {
+                connection.disconnect()
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun parseReverse(json: String): String? = try {
+        org.json.JSONObject(json).optString("display_name").ifBlank { null }
+    } catch (e: Exception) {
+        null
+    }
 
     /** Never throws: an unexpected payload is simply "no results". */
     fun parse(json: String): List<Place> = try {

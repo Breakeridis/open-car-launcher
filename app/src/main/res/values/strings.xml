@@ -35,7 +35,17 @@
     <string name="map_search_while_driving">Search is available when the vehicle is stopped</string>
     <string name="map_navigate">Navigate</string>
     <string name="map_clear_pin">Remove pin</string>
-    <string name="map_no_nav_app">No navigation app accepts destinations</string>
+    <string name="map_dropped_pin">Dropped pin</string>
+    <string name="map_pin_hint">Long-press the map to drop a pin</string>
+    <string name="map_search_results">%1$d results</string>
+    <string name="nav_end">End</string>
+    <string name="nav_routing">Calculating route…</string>
+    <string name="nav_rerouting">Recalculating…</string>
+    <string name="nav_no_route">No route found — check the connection</string>
+    <string name="nav_need_gps">Waiting for a GPS fix to plan the route</string>
+    <string name="nav_arrived">You have arrived</string>
+    <string name="nav_summary">%1$s · %2$s · %3$s</string>
+    <string name="nav_resumed">Resuming navigation</string>
 
     <!-- Radio -->
     <string name="radio_no_freq">--.-</string>

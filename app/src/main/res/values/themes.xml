@@ -14,6 +14,20 @@
         <item name="android:textColorPrimary">@color/cockpit_text_primary</item>
         <item name="android:textColorSecondary">@color/cockpit_text_secondary</item>
         <item name="android:windowBackground">@color/cockpit_bg</item>
+        <!-- Every AlertDialog gets the cockpit palette (day and night), not stock Material colours. -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.CarLauncher.Alert</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.CarLauncher.Alert</item>
+    </style>
+
+    <style name="ThemeOverlay.CarLauncher.Alert" parent="ThemeOverlay.Material3.Dialog.Alert">
+        <item name="colorPrimary">@color/cockpit_accent</item>
+        <item name="colorSurface">@color/cockpit_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/cockpit_surface</item>
+        <item name="colorOnSurface">@color/cockpit_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/cockpit_text_secondary</item>
+        <item name="android:textColorPrimary">@color/cockpit_text_primary</item>
+        <item name="android:textColorSecondary">@color/cockpit_text_secondary</item>
+        <item name="android:textColorHint">@color/cockpit_text_dim</item>
     </style>
 
     <!-- The HOME activity itself. Opaque background: most head units have no wallpaper. -->
