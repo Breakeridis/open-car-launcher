@@ -23,8 +23,8 @@ android {
         // NOTE: deliberately NOT targetSdk 36. Android 16 ignores android:screenOrientation for
         // apps targeting 36 on displays with smallestWidth >= 600dp - which is exactly a head unit.
         targetSdk = 35
-        versionCode = 12
-        versionName = "0.12"
+        versionCode = 13
+        versionName = "0.13"
 
         // TODO: point these at the repository that hosts the release APKs.
         buildConfigField("String", "GITHUB_OWNER", "\"Breakeridis\"")
