@@ -32,6 +32,15 @@ object Prefs {
     const val KEY_CACHED_URL = "pref_cached_latest_url"
     const val KEY_PENDING_APK = "pref_pending_apk_path"
     const val KEY_FIRST_RUN_DONE = "pref_first_run_done"
+    const val KEY_RADIO_PACKAGE = "pref_radio_package"
+    const val KEY_RADIO_PRESETS = "pref_radio_presets"
+    const val KEY_RADIO_LAST = "pref_radio_last_frequency"
+    const val KEY_RADIO_LAST_NAME = "pref_radio_last_station"
+    const val KEY_VEHICLE_SETTINGS_PACKAGE = "pref_vehicle_settings_package"
+    const val KEY_MAP_LAT = "pref_map_lat"
+    const val KEY_MAP_LON = "pref_map_lon"
+    const val KEY_MAP_ZOOM = "pref_map_zoom"
+    const val KEY_MAP_HEADING_UP = "pref_map_heading_up"
 
     const val COMPASS_AUTO = "auto"
     const val COMPASS_GPS = "gps"
@@ -117,4 +126,60 @@ object Prefs {
     var firstRunDone: Boolean
         get() = sp.getBoolean(KEY_FIRST_RUN_DONE, false)
         set(value) = sp.edit().putBoolean(KEY_FIRST_RUN_DONE, value).apply()
+
+    // ------------------------------------------------------------------ radio
+
+    /** The head unit's native tuner app. Null means "detect by package name". */
+    var radioPackage: String?
+        get() = sp.getString(KEY_RADIO_PACKAGE, null)?.ifBlank { null }
+        set(value) = sp.edit().putString(KEY_RADIO_PACKAGE, value).apply()
+
+    /** Fixed-length preset slots, each a [RadioFrequency.encode] string or "" for empty. */
+    var radioPresets: List<String>
+        get() = DockCodec.decode(sp.getString(KEY_RADIO_PRESETS, null), Constants.RADIO_PRESET_COUNT)
+        set(value) = sp.edit().putString(KEY_RADIO_PRESETS, DockCodec.encode(value)).apply()
+
+    /**
+     * Last frequency seen on the tuner, so the widget shows a station the instant the unit
+     * wakes from ACC-off, before the radio app has republished its media session.
+     */
+    var radioLastFrequency: String
+        get() = sp.getString(KEY_RADIO_LAST, "") ?: ""
+        set(value) = sp.edit().putString(KEY_RADIO_LAST, value).apply()
+
+    var radioLastStation: String
+        get() = sp.getString(KEY_RADIO_LAST_NAME, "") ?: ""
+        set(value) = sp.edit().putString(KEY_RADIO_LAST_NAME, value).apply()
+
+    // ---------------------------------------------------------------- vehicle
+
+    /** The factory "car settings" app. Null falls back to Android's own Settings. */
+    var vehicleSettingsPackage: String?
+        get() = sp.getString(KEY_VEHICLE_SETTINGS_PACKAGE, null)?.ifBlank { null }
+        set(value) = sp.edit().putString(KEY_VEHICLE_SETTINGS_PACKAGE, value).apply()
+
+    // -------------------------------------------------------------------- map
+
+    /** Last camera position, restored on boot so the portal never opens on an empty ocean. */
+    fun mapCamera(): Triple<Double, Double, Double>? {
+        if (!sp.contains(KEY_MAP_LAT)) return null
+        val lat = sp.getFloat(KEY_MAP_LAT, 0f).toDouble()
+        val lon = sp.getFloat(KEY_MAP_LON, 0f).toDouble()
+        val zoom = sp.getFloat(KEY_MAP_ZOOM, 16f).toDouble()
+        if (lat !in -85.0..85.0 || lon !in -180.0..180.0) return null
+        return Triple(lat, lon, zoom)
+    }
+
+    fun saveMapCamera(lat: Double, lon: Double, zoom: Double) {
+        sp.edit()
+            .putFloat(KEY_MAP_LAT, lat.toFloat())
+            .putFloat(KEY_MAP_LON, lon.toFloat())
+            .putFloat(KEY_MAP_ZOOM, zoom.toFloat())
+            .apply()
+    }
+
+    /** True = map rotates so travel direction is up; false = north-up. */
+    var mapHeadingUp: Boolean
+        get() = sp.getBoolean(KEY_MAP_HEADING_UP, true)
+        set(value) = sp.edit().putBoolean(KEY_MAP_HEADING_UP, value).apply()
 }

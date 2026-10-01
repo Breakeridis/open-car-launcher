@@ -17,4 +17,8 @@
 
     <color name="cockpit_scrim">#F207090C</color>
     <color name="cockpit_ripple">#33FFFFFF</color>
+
+    <color name="cockpit_hud">#E607090C</color>
+    <color name="cockpit_ok">#FF4CD964</color>
+    <color name="cockpit_warn">#FFFFB020</color>
 </resources>

@@ -22,6 +22,8 @@ object SettingsDialog {
         repository: AppRepository,
         scope: CoroutineScope,
         onDockReset: () -> Unit,
+        onPickRadioApp: () -> Unit,
+        onRadioAccess: () -> Unit,
         onPrefsChanged: () -> Unit
     ) {
         val view = LayoutInflater.from(activity).inflate(R.layout.dialog_settings, null, false)
@@ -72,6 +74,39 @@ object SettingsDialog {
             // do NOT call recreate() here, and keep uiMode out of the activity's configChanges
             // or this path is bypassed and half the views keep the old colours.
             AppCompatDelegate.setDefaultNightMode(mode)
+        }
+
+        // --- radio ---
+        val radioButton = view.findViewById<Button>(R.id.btnRadioApp)
+        radioButton.text = activity.getString(
+            R.string.settings_radio_app,
+            Prefs.radioPackage?.let { repository.findByPackage(it)?.label ?: it }
+                ?: activity.getString(R.string.settings_radio_auto)
+        )
+        radioButton.setOnClickListener {
+            dialog.dismiss()
+            onPickRadioApp()
+        }
+        view.findViewById<Button>(R.id.btnRadioAccess).setOnClickListener {
+            dialog.dismiss()
+            onRadioAccess()
+        }
+
+        // --- vehicle settings button ---
+        val vehicleButton = view.findViewById<Button>(R.id.btnVehicleApp)
+        fun renderVehicleLabel() {
+            val label = Prefs.vehicleSettingsPackage?.let { stored ->
+                val pkg = IntentUtil.packageOf(stored)
+                repository.findByPackage(pkg)?.label ?: pkg
+            } ?: activity.getString(R.string.settings_vehicle_default)
+            vehicleButton.text = activity.getString(R.string.settings_vehicle_app, label)
+        }
+        renderVehicleLabel()
+        vehicleButton.setOnClickListener {
+            AppPicker.show(activity, repository, scope, R.string.pick_vehicle_app) { entry ->
+                Prefs.vehicleSettingsPackage = entry.component.flattenToShortString()
+                renderVehicleLabel()
+            }
         }
 
         // --- dashcam / DVR ---

@@ -15,7 +15,50 @@
     <string name="heading_source_gps">GPS</string>
     <string name="heading_source_mag">MAG</string>
     <string name="no_compass">No compass on this device</string>
-    <string name="speed">Speed</string>
+    <string name="speed">Speed. Tap to switch units</string>
+    <string name="gps_lock">● GPS lock</string>
+    <string name="clock_open">Clock. Tap for alarms</string>
+
+    <!-- Map portal -->
+    <string name="map_recenter">Recenter on the car</string>
+    <string name="map_orientation_toggle">Heading. Tap to switch heading-up / north-up</string>
+    <string name="map_mode_heading">▲ Heading up</string>
+    <string name="map_mode_north">N North up</string>
+    <string name="map_heading_up">Map: heading up</string>
+    <string name="map_north_up">Map: north up</string>
+    <string name="map_search_title">Search address or place</string>
+    <string name="map_search_hint">Address, city or place</string>
+    <string name="map_search_go">Search</string>
+    <string name="map_searching">Searching…</string>
+    <string name="map_search_none">Nothing found</string>
+    <string name="map_search_offline">Search needs an internet connection</string>
+    <string name="map_search_while_driving">Search is available when the vehicle is stopped</string>
+    <string name="map_navigate">Navigate</string>
+    <string name="map_clear_pin">Remove pin</string>
+    <string name="map_no_nav_app">No navigation app accepts destinations</string>
+
+    <!-- Radio -->
+    <string name="radio_no_freq">--.-</string>
+    <string name="radio_band_fm">FM</string>
+    <string name="radio_open">Radio. Tap to open, long-press to choose the radio app</string>
+    <string name="radio_seek_down">Seek down. Long-press to step down</string>
+    <string name="radio_seek_up">Seek up. Long-press to step up</string>
+    <string name="radio_grant_access">Tap to sync with the car radio</string>
+    <string name="radio_not_playing">Radio not playing</string>
+    <string name="radio_preset_empty">+</string>
+    <string name="radio_preset_desc">Preset %1$d, %2$s. Long-press to replace</string>
+    <string name="radio_preset_empty_desc">Empty preset %1$d. Long-press to save the current station</string>
+    <string name="radio_preset_title">Preset %1$d</string>
+    <string name="radio_preset_hint">Frequency, e.g. 88.6 or 1062</string>
+    <string name="radio_preset_save">Save</string>
+    <string name="radio_preset_invalid">Not a valid FM or AM frequency</string>
+    <string name="radio_preset_saved">%1$s saved to preset %2$d</string>
+    <string name="radio_unreachable">The radio is not responding — opening it</string>
+    <string name="radio_tune_ignored">The radio app did not accept direct tuning</string>
+    <string name="pick_radio_app">Choose the car radio app</string>
+    <string name="radio_access_hint">Enable notification access for Minimal Car Launcher</string>
+    <string name="radio_access_title">Radio sync</string>
+    <string name="radio_access_adb">This head unit hides the notification-access screen. Grant it once over adb:\n\nadb shell cmd notification allow_listener %1$s</string>
 
     <!-- Quick cards -->
     <string name="card_projection">Phone Link</string>
@@ -27,7 +70,11 @@
 
     <!-- Dock -->
     <string name="dock_all_apps">All apps</string>
-    <string name="dock_settings">System settings. Long-press for launcher settings</string>
+    <string name="dock_settings">Vehicle settings. Long-press for launcher settings</string>
+    <string name="dock_theme">Switch day / night cockpit</string>
+    <string name="dock_updates">Updates and about</string>
+    <string name="theme_now_day">Day cockpit</string>
+    <string name="theme_now_night">Night cockpit</string>
     <string name="dock_about">About</string>
     <string name="dock_empty_slot">Empty dock slot</string>
     <string name="dock_add_app">Add app</string>
@@ -76,6 +123,14 @@
     <string name="settings_dashcam_return">Return to the dashboard afterwards</string>
     <string name="settings_dashcam_hint">The DVR app draws its own floating window — drag it once into free dashboard space and it should stay there.</string>
     <string name="pick_dashcam_app">Choose your dashcam / DVR app</string>
+    <string name="settings_radio">Radio</string>
+    <string name="settings_radio_app">Radio app: %1$s</string>
+    <string name="settings_radio_auto">detect automatically</string>
+    <string name="settings_radio_access">Allow radio sync (notification access)</string>
+    <string name="settings_vehicle">Vehicle settings button</string>
+    <string name="settings_vehicle_app">Opens: %1$s</string>
+    <string name="settings_vehicle_default">Android settings</string>
+    <string name="pick_vehicle_app">Choose the car / factory settings app</string>
     <string name="settings_reset_dock">Reset dock to empty</string>
     <string name="settings_home_app">Set as Home app</string>
     <string name="dock_reset">Dock cleared</string>

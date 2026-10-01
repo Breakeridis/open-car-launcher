@@ -20,4 +20,9 @@
 
     <color name="cockpit_scrim">#F2F2F4F7</color>
     <color name="cockpit_ripple">#33101418</color>
+
+    <!-- Translucent plates for text drawn over the map. -->
+    <color name="cockpit_hud">#E6FFFFFF</color>
+    <color name="cockpit_ok">#FF1B8A3A</color>
+    <color name="cockpit_warn">#FFB26A00</color>
 </resources>

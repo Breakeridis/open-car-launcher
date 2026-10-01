@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Updater only. Everything else works with zero connectivity. -->
+    <!-- Updater, map tiles and address search. The clock, radio, speedometer, docks and any
+         already-cached map area keep working with zero connectivity. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -55,6 +56,7 @@
              launcher activity (the stock shell starts them), so the MAIN/LAUNCHER intent
              query above would not make them visible.
              TODO: verify per head unit with `adb shell pm list packages | grep -i link`. -->
+        <package android:name="com.zjinnova.zlink" />
         <package android:name="com.zjinglink.zlink" />
         <package android:name="com.carlinkit.zlink" />
         <package android:name="cn.manstep.phonemirror" />
@@ -102,6 +104,18 @@
                 <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
+
+        <!-- Radio sync. Granting this listener "notification access" is the only public way
+             to read the native tuner's media session; it never reads notifications. -->
+        <service
+            android:name=".radio.MediaSessionListener"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"

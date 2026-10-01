@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.minimal.carlauncher.core.Prefs
 import com.minimal.carlauncher.data.AppRepository
+import com.minimal.carlauncher.radio.RadioRepository
 import com.minimal.carlauncher.update.UpdateRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -14,6 +15,7 @@ import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import org.osmdroid.config.Configuration as OsmConfiguration
 
 class CarLauncherApp : Application() {
 
@@ -23,6 +25,9 @@ class CarLauncherApp : Application() {
         private set
 
     lateinit var updateRepository: UpdateRepository
+        private set
+
+    lateinit var radioRepository: RadioRepository
         private set
 
     /**
@@ -47,6 +52,31 @@ class CarLauncherApp : Application() {
         appRepository.start()
 
         updateRepository = UpdateRepository(this, appScope)
+
+        // App-scoped so the last station and the session binding survive activity recreates.
+        radioRepository = RadioRepository(this)
+
+        configureMapTiles()
+    }
+
+    /**
+     * osmdroid defaults to a tile cache on external storage (which would need a storage
+     * permission) and to the generic "osmdroid" user agent, which the OpenStreetMap tile
+     * servers block. Both are overridden before any MapView exists.
+     *
+     * Two download threads, not the default eight: the T507 / A133 class of SoC and its
+     * typical phone-hotspot connection are both easily saturated, and a stalled UI thread on
+     * the home screen is worse than tiles arriving a moment later.
+     */
+    private fun configureMapTiles() {
+        OsmConfiguration.getInstance().apply {
+            userAgentValue = "${BuildConfig.APPLICATION_ID}/${BuildConfig.VERSION_NAME}"
+            osmdroidBasePath = File(filesDir, "osmdroid")
+            osmdroidTileCache = File(cacheDir, "osm-tiles")
+            tileFileSystemCacheMaxBytes = 300L * 1024L * 1024L
+            tileFileSystemCacheTrimBytes = 240L * 1024L * 1024L
+            tileDownloadThreads = 2
+        }
     }
 
     /**

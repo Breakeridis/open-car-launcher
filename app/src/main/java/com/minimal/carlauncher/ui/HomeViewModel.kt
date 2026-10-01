@@ -137,7 +137,9 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
             headingSource = source,
             gpsEnabled = speedProvider.isGpsEnabled,
             permissionGranted = speedProvider.hasPermission,
-            preciseLocation = speedProvider.hasPermission
+            preciseLocation = speedProvider.hasPermission,
+            latitude = location?.latitude,
+            longitude = location?.longitude
         )
     }
 

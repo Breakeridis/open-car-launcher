@@ -39,6 +39,19 @@
         <item name="android:textColor">@color/cockpit_text_primary</item>
     </style>
 
+    <!-- Radio preset chip: equal-width, full-height touch target. -->
+    <style name="Text.RadioPreset" parent="Text.Gauge">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_preset</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:longClickable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/radio_preset_text</item>
+    </style>
+
     <style name="Text.Caption" parent="">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textAllCaps">true</item>

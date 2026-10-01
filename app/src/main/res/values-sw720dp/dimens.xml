@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Larger panels (1280x720 and up) can afford bigger gauges. -->
+<!-- 1920x1080 at 240 dpi (1280x720 dp): the expected T507 / A133 configuration. -->
 <resources>
-    <dimen name="screen_padding">24dp</dimen>
-    <dimen name="gap">16dp</dimen>
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="gap">12dp</dimen>
+    <dimen name="tile_padding">12dp</dimen>
 
-    <dimen name="speed_text">140sp</dimen>
-    <dimen name="speed_unit_text">26sp</dimen>
-    <dimen name="clock_text">96sp</dimen>
-    <dimen name="date_text">24sp</dimen>
-    <dimen name="cardinal_text">72sp</dimen>
-    <dimen name="degrees_text">22sp</dimen>
+    <dimen name="clock_text">68sp</dimen>
+    <dimen name="clock_seconds_text">24sp</dimen>
+    <dimen name="date_text">18sp</dimen>
+    <dimen name="gauge_caption_text">13sp</dimen>
 
-    <dimen name="card_label_text">26sp</dimen>
-    <dimen name="card_icon">52dp</dimen>
-    <dimen name="card_height">160dp</dimen>
+    <dimen name="radio_freq_text">56sp</dimen>
+    <dimen name="radio_freq_height">64dp</dimen>
+    <dimen name="radio_station_text">18sp</dimen>
+    <dimen name="radio_rt_text">14sp</dimen>
+    <dimen name="radio_seek_size">60dp</dimen>
+    <dimen name="radio_preset_height">56dp</dimen>
+    <dimen name="radio_preset_text">18sp</dimen>
 
-    <dimen name="dock_height">88dp</dimen>
-    <dimen name="dock_icon">52dp</dimen>
-    <dimen name="dock_item_width">84dp</dimen>
+    <dimen name="map_bezel_width">38dp</dimen>
+    <dimen name="map_vehicle_size">36dp</dimen>
+    <dimen name="map_hud_inset">28dp</dimen>
+    <dimen name="map_button_size">60dp</dimen>
+    <dimen name="speed_text">120sp</dimen>
+    <dimen name="speed_unit_text">22sp</dimen>
+    <dimen name="cardinal_text">30sp</dimen>
+    <dimen name="degrees_text">18sp</dimen>
+
+    <dimen name="card_label_text">22sp</dimen>
+    <dimen name="card_sub_text">14sp</dimen>
+    <dimen name="card_icon">48dp</dimen>
+    <dimen name="card_icon_large">64dp</dimen>
+
+    <dimen name="dock_height">76dp</dimen>
+    <dimen name="dock_icon">44dp</dimen>
+    <dimen name="dock_item_width">64dp</dimen>
 
     <dimen name="app_icon_size">64dp</dimen>
     <dimen name="app_grid_item_height">120dp</dimen>

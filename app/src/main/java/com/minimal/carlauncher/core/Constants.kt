@@ -33,13 +33,28 @@ object Constants {
     /** Above this, GPS course-over-ground beats the magnetometer for heading. */
     const val GPS_BEARING_MIN_MPS = 1.5f
 
+    /** Favourite-station chips on the radio widget. */
+    const val RADIO_PRESET_COUNT = 4
+
+    /** How long to wait for the tuner to report a requested frequency before saying it failed. */
+    const val RADIO_TUNE_CONFIRM_MS = 2_500L
+
+    /** After the driver pans the map, snap back to following the car after this long. */
+    const val MAP_AUTO_RECENTER_MS = 20_000L
+
+    /** Zoom used the first time a GPS fix arrives (street level, readable at a glance). */
+    const val MAP_DEFAULT_ZOOM = 16.0
+
     /**
      * Phone-projection adapters, tried in order. These ids are firmware dependent -
      * verify on the target unit with:
      *   adb shell pm list packages | grep -iE "link|auto|carplay"
+     *
+     * Allwinner T507 / A133 units (NWD K2401P platform and its rebrands) commonly ship
+     * Zjinnova's ZLink, which is why its package is tried first.
      */
     val PROJECTION_TARGETS = listOf(
-        ProjectionTarget("ZLink", listOf("com.zjinglink.zlink", "com.carlinkit.zlink", "cn.manstep.phonemirror")),
+        ProjectionTarget("ZLink", listOf("com.zjinnova.zlink", "com.zjinglink.zlink", "com.carlinkit.zlink", "cn.manstep.phonemirror")),
         ProjectionTarget("AutoKit", listOf("com.autokit.carplay", "com.carbit.autokit", "com.autokit.link")),
         ProjectionTarget("EasyConnection", listOf("net.easyconn", "net.easyconn.carman")),
         ProjectionTarget("Headunit Reloaded", listOf("com.hur.headunit", "com.hur.reloaded")),

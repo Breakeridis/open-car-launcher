@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 1920x1080 at 160 dpi (1920x1080 dp): ROMs that leave the panel at mdpi. -->
+<resources>
+    <dimen name="screen_padding">24dp</dimen>
+    <dimen name="gap">16dp</dimen>
+    <dimen name="tile_padding">16dp</dimen>
+
+    <dimen name="clock_text">96sp</dimen>
+    <dimen name="clock_seconds_text">32sp</dimen>
+    <dimen name="date_text">24sp</dimen>
+    <dimen name="gauge_caption_text">16sp</dimen>
+
+    <dimen name="radio_freq_text">80sp</dimen>
+    <dimen name="radio_freq_height">92dp</dimen>
+    <dimen name="radio_station_text">24sp</dimen>
+    <dimen name="radio_rt_text">18sp</dimen>
+    <dimen name="radio_seek_size">80dp</dimen>
+    <dimen name="radio_preset_height">72dp</dimen>
+    <dimen name="radio_preset_text">24sp</dimen>
+
+    <dimen name="map_bezel_width">50dp</dimen>
+    <dimen name="map_vehicle_size">48dp</dimen>
+    <dimen name="map_hud_inset">40dp</dimen>
+    <dimen name="map_button_size">76dp</dimen>
+    <dimen name="speed_text">168sp</dimen>
+    <dimen name="speed_unit_text">30sp</dimen>
+    <dimen name="cardinal_text">40sp</dimen>
+    <dimen name="degrees_text">24sp</dimen>
+
+    <dimen name="card_label_text">30sp</dimen>
+    <dimen name="card_sub_text">18sp</dimen>
+    <dimen name="card_icon">64dp</dimen>
+    <dimen name="card_icon_large">88dp</dimen>
+
+    <dimen name="dock_height">100dp</dimen>
+    <dimen name="dock_icon">60dp</dimen>
+    <dimen name="dock_item_width">88dp</dimen>
+    <dimen name="badge_size">16dp</dimen>
+
+    <dimen name="app_icon_size">80dp</dimen>
+    <dimen name="app_label_text">16sp</dimen>
+    <dimen name="app_grid_item_height">150dp</dimen>
+    <dimen name="search_text">24sp</dimen>
+</resources>

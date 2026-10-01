@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
@@ -14,10 +16,11 @@ import com.minimal.carlauncher.data.AppRepository
 import com.minimal.carlauncher.databinding.ActivityHomeBinding
 import com.minimal.carlauncher.util.IntentUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlin.math.abs
 
 /**
- * The all-apps drawer, which is an overlay inside the home layout rather than its own screen.
- * The dock stays visible underneath it, so "pin to dock" has a visible target.
+ * The full-screen all-apps drawer, an overlay inside the home layout rather than its own screen.
+ * Dismissed by the close button, HOME, BACK, a tap on its margins or a downward fling.
  */
 class DrawerController(
     private val activity: Activity,
@@ -49,6 +52,9 @@ class DrawerController(
         binding.appGrid.adapter = adapter
 
         binding.btnCloseDrawer.setOnClickListener { close() }
+        // The drawer covers the whole screen; a tap on its margins dismisses it.
+        binding.drawerContainer.setOnClickListener { close() }
+        bindSwipeDownToClose()
 
         binding.searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) = Unit
@@ -125,8 +131,35 @@ class DrawerController(
             .show()
     }
 
+    /** A downward fling while the grid is already scrolled to the top closes the drawer. */
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
+    private fun bindSwipeDownToClose() {
+        val minVelocity = FLING_CLOSE_DP_PER_S * activity.resources.displayMetrics.density
+        val detector = GestureDetector(activity, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(
+                e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
+            ): Boolean {
+                if (velocityY > minVelocity && abs(velocityY) > abs(velocityX) * 1.5f &&
+                    !binding.appGrid.canScrollVertically(-1)
+                ) {
+                    close()
+                    return true
+                }
+                return false
+            }
+        })
+        binding.appGrid.setOnTouchListener { _, event ->
+            detector.onTouchEvent(event)
+            false   // the grid still scrolls normally
+        }
+    }
+
     private fun hideKeyboard() {
         val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(binding.searchInput.windowToken, 0)
+    }
+
+    private companion object {
+        const val FLING_CLOSE_DP_PER_S = 1_200f
     }
 }

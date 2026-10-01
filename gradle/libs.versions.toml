@@ -11,6 +11,7 @@ lifecycle = "2.8.7"
 coroutines = "1.8.1"
 junit = "4.13.2"
 json = "20231013"
+osmdroid = "6.1.20"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -22,6 +23,9 @@ androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", ve
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+# OpenStreetMap renderer for the map portal. Not Google Maps: Allwinner T507 / A133 head units
+# (and most other aftermarket units) ship without Google Play Services.
+osmdroid = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 # Unit-test only: android.jar ships org.json as a throwing stub, so the real implementation
 # has to be on the test classpath for DockCodec / ReleaseInfo tests to run on the JVM.

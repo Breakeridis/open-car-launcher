@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Weighted so four slots always split the dock evenly, whatever the column width. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dockSlotRoot"
-    android:layout_width="@dimen/dock_item_width"
+    android:layout_width="0dp"
     android:layout_height="match_parent"
+    android:layout_weight="1"
     android:background="@drawable/bg_dock_item"
     android:clickable="true"
     android:focusable="true"
